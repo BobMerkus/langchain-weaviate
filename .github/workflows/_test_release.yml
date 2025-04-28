@@ -67,8 +67,8 @@ jobs:
         shell: bash
         working-directory: ${{ inputs.working-directory }}
         run: |
-          pkg_name=$(uv run python -c "from configparser import ConfigParser; c = ConfigParser(); c.read('pyproject.toml'); print(c['project']['name'])")
-          pkg_version=$(uv run python -c "from configparser import ConfigParser; c = ConfigParser(); c.read('pyproject.toml'); print(c['project']['version'])")
+          pkg_name=$(uv run python -c "import tomllib; toml_data = tomllib.load(open('pyproject.toml', 'rb')); print(toml_data['project']['name'])")
+          pkg_version=$(uv run python -c "import tomllib; toml_data = tomllib.load(open('pyproject.toml', 'rb')); print(toml_data['project']['version'])")
           echo pkg-name="$pkg_name" >> $GITHUB_OUTPUT
           echo version="$pkg_version" >> $GITHUB_OUTPUT
 
