@@ -3,11 +3,6 @@
 # Default target executed when no arguments are given to make.
 all: help
 
-# Define a variable for the test file path.
-
-# test:
-# 	poetry run pytest $(TEST_FILE)
-
 update-weaviate-image:
 	$(eval DOCKER_COMPOSE_FILE := tests/docker-compose.yml)
 
@@ -33,10 +28,10 @@ TEST_FILE ?= tests/unit_tests/
 integration_test integration_tests: TEST_FILE=tests/integration_tests/
 
 test tests:
-	poetry run pytest $(TEST_FILE) --cov=langchain_weaviate --cov-report term-missing --cov-fail-under=96.44
+	uv run pytest $(TEST_FILE) --cov=langchain_weaviate --cov-report term-missing --cov-fail-under=96.44
 
 integration_test integration_tests: update-weaviate-image
-	poetry run pytest $(TEST_FILE) --cov=langchain_weaviate --cov-report term-missing
+	uv run pytest $(TEST_FILE) --cov=langchain_weaviate --cov-report term-missing
 
 ######################
 # LINTING AND FORMATTING
@@ -52,23 +47,23 @@ lint_tests: PYTHON_FILES=tests
 lint_tests: MYPY_CACHE=.mypy_cache_test
 
 lint lint_diff lint_package lint_tests:
-	poetry run ruff check .
-	poetry run ruff format $(PYTHON_FILES) --diff
-	poetry run ruff check --select I $(PYTHON_FILES)
-	mkdir $(MYPY_CACHE); poetry run mypy $(PYTHON_FILES) --cache-dir $(MYPY_CACHE)
+	uv run ruff check .
+	uv run ruff format $(PYTHON_FILES) --diff
+	uv run ruff check --select I $(PYTHON_FILES)
+	mkdir $(MYPY_CACHE); uv run mypy $(PYTHON_FILES) --cache-dir $(MYPY_CACHE)
 
 format format_diff:
-	poetry run ruff format $(PYTHON_FILES)
-	poetry run ruff check --fix $(PYTHON_FILES)
+	uv run ruff format $(PYTHON_FILES)
+	uv run ruff check --fix $(PYTHON_FILES)
 
 spell_check:
-	poetry run codespell --toml pyproject.toml
+	uv run codespell --toml pyproject.toml
 
 spell_fix:
-	poetry run codespell --toml pyproject.toml -w
+	uv run codespell --toml pyproject.toml -w
 
 check_imports: $(shell find langchain_weaviate -name '*.py')
-	poetry run python ./scripts/check_imports.py $^
+	uv run python ./scripts/check_imports.py $^
 
 ######################
 # HELP

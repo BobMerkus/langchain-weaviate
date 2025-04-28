@@ -1,4 +1,4 @@
-name: compile-integration-test
+name: compile integration test
 
 on:
   workflow_call:
@@ -9,7 +9,7 @@ on:
         description: "From which folder this pipeline executes"
 
 env:
-  POETRY_VERSION: "1.7.1"
+  UV_VERSION: "0.6.17"
 
 jobs:
   build:
@@ -20,29 +20,30 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - "3.8"
           - "3.9"
           - "3.10"
           - "3.11"
-    name: "poetry run pytest -m compile tests/integration_tests #${{ matrix.python-version }}"
+          - "3.12"
+          - "3.13"
+    name: "pytest -m compile tests/integration_tests #${{ matrix.python-version }}"
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }} + Poetry ${{ env.POETRY_VERSION }}
-        uses: "./.github/actions/poetry_setup"
+      - name: Install uv and set Python version
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python-version }}
-          poetry-version: ${{ env.POETRY_VERSION }}
-          working-directory: ${{ inputs.working-directory }}
-          cache-key: compile-integration
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: "${{ inputs.working-directory }}/uv.lock"
 
-      - name: Install integration dependencies
+      - name: Install dependencies
         shell: bash
-        run: poetry install --with=test_integration,test
+        run: uv sync --group test_integration --group test
 
-      - name: Check integration tests compile
+      - name: Run compile tests
         shell: bash
-        run: poetry run pytest -m compile tests/integration_tests
+        run: uv run pytest -m compile tests/integration_tests
 
       - name: Ensure the tests did not create any additional files
         shell: bash

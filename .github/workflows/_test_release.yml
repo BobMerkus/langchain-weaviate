@@ -14,8 +14,8 @@ on:
         description: "Release from a non-master branch (danger!)"
 
 env:
-  POETRY_VERSION: "1.7.1"
   PYTHON_VERSION: "3.10"
+  UV_VERSION: "0.6.17"
 
 jobs:
   build:
@@ -29,13 +29,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python + Poetry ${{ env.POETRY_VERSION }}
-        uses: "./.github/actions/poetry_setup"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: "${{ inputs.working-directory }}/uv.lock"
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          poetry-version: ${{ env.POETRY_VERSION }}
-          working-directory: ${{ inputs.working-directory }}
-          cache-key: release
 
       # We want to keep this build stage *separate* from the release stage,
       # so that there's no sharing of permissions between them.
@@ -49,7 +53,7 @@ jobs:
       # > from the publish job.
       # https://github.com/pypa/gh-action-pypi-publish#non-goals
       - name: Build project for distribution
-        run: poetry build
+        run: uv build
         working-directory: ${{ inputs.working-directory }}
 
       - name: Upload build
@@ -63,8 +67,10 @@ jobs:
         shell: bash
         working-directory: ${{ inputs.working-directory }}
         run: |
-          echo pkg-name="$(poetry version | cut -d ' ' -f 1)" >> $GITHUB_OUTPUT
-          echo version="$(poetry version --short)" >> $GITHUB_OUTPUT
+          pkg_name=$(uv run python -c "from configparser import ConfigParser; c = ConfigParser(); c.read('pyproject.toml'); print(c['project']['name'])")
+          pkg_version=$(uv run python -c "from configparser import ConfigParser; c = ConfigParser(); c.read('pyproject.toml'); print(c['project']['version'])")
+          echo pkg-name="$pkg_name" >> $GITHUB_OUTPUT
+          echo version="$pkg_version" >> $GITHUB_OUTPUT
 
   publish:
     needs:

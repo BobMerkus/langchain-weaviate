@@ -18,22 +18,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install Dependencies
-        run: |
-          pip install toml
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
-      - name: Extract Ignore Words List
-        working-directory: ${{ inputs.working-directory }}
-        run: |
-          # Use a Python script to extract the ignore words list from pyproject.toml
-          python ../../.github/workflows/extract_ignored_words_list.py
-        id: extract_ignore_words
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "${{ inputs.working-directory }}/pyproject.toml"
 
       - name: Codespell
         uses: codespell-project/actions-codespell@v2
         with:
           skip: guide_imports.json
-          ignore_words_list: ${{ steps.extract_ignore_words.outputs.ignore_words_list }}

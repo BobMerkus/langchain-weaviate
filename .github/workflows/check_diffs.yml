@@ -17,21 +17,26 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  POETRY_VERSION: "1.7.1"
+  UV_VERSION: "0.6.17"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
+          version: ${{ env.UV_VERSION }}
           python-version: '3.10'
+          
       - id: files
         uses: Ana06/get-changed-files@v2.2.0
+        
       - id: set-matrix
         run: |
-          python .github/scripts/check_diff.py ${{ steps.files.outputs.all }} >> $GITHUB_OUTPUT
+          uv run python .github/scripts/check_diff.py ${{ steps.files.outputs.all }} >> $GITHUB_OUTPUT
     outputs:
       dirs-to-lint: ${{ steps.set-matrix.outputs.dirs-to-lint }}
       dirs-to-test: ${{ steps.set-matrix.outputs.dirs-to-test }}

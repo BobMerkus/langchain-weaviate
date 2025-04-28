@@ -44,8 +44,8 @@ def get_min_version_from_toml(toml_path: str, versions_for: str):
     with open(toml_path, "rb") as file:
         toml_data = tomllib.load(file)
 
-    # Get the dependencies from tool.poetry.dependencies
-    dependencies = toml_data["tool"]["poetry"]["dependencies"]
+    # Get the dependencies from project.dependencies
+    dependencies = toml_data["project"]["dependencies"]
 
     # Initialize a dictionary to store the minimum versions
     min_versions = {}
@@ -57,18 +57,15 @@ def get_min_version_from_toml(toml_path: str, versions_for: str):
             # changes
             continue
         # Check if the lib is present in the dependencies
-        if lib in dependencies:
-            # Get the version string
-            version_string = dependencies[lib]
-
-            if isinstance(version_string, dict):
-                version_string = version_string["version"]
-
-            # Use parse_version to get the minimum supported version from version_string
-            min_version = get_min_version(version_string)
-
-            # Store the minimum version in the min_versions dictionary
-            min_versions[lib] = min_version
+        for dep in dependencies:
+            if dep.startswith(lib):
+                # Extract version constraint
+                parts = dep.split(">=")
+                if len(parts) > 1:
+                    # Handle format like "langchain-core>=0.1.0"
+                    version_part = parts[1].split(",")[0]
+                    min_versions[lib] = version_part
+                break
 
     return min_versions
 
