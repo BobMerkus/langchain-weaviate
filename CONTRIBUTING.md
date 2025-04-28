@@ -19,7 +19,7 @@ If you are new to dev containers, check out a tutorial for your IDE, such as [th
 To install all dependencies, run the following command:
 
 ```shell
-poetry install --with test,dev,lint,test_integration
+uv sync --all-groups
 ```
 
 Note: This command is run automatically when you start the development container.
