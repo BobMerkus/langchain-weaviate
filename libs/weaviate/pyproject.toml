@@ -1,69 +1,64 @@
-[tool.poetry]
-name = "langchain-weaviate"
-version = "0.0.4"
-description = "An integration package connecting Weaviate and LangChain"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
 authors = []
+license = {text = "MIT"}
+requires-python = "<4.0,>=3.9"
+dependencies = [
+    "langchain-core<0.4,>=0.1.33",
+    "weaviate-client<5.0.0,>=4.0.0",
+    "numpy<2.0.0,>=1.26.2",
+    "simsimd<7.0.0,>=6.2.1",
+]
+name = "langchain-weaviate"
+version = "0.1.0"
+description = "An integration package connecting Weaviate and LangChain"
 readme = "README.md"
-repository = "https://github.com/langchain-ai/langchain-weaviate"
-license = "MIT"
 
-[tool.poetry.urls]
+[project.urls]
 "Source Code" = "https://github.com/langchain-ai/langchain-weaviate/tree/main/libs/weaviate"
+repository = "https://github.com/langchain-ai/langchain-weaviate"
 
-[tool.poetry.dependencies]
-python = ">=3.9,<4.0"
-langchain-core = ">=0.1.33,<0.4"
-weaviate-client = "^4.0.0"
-numpy = "^1.26.2"
-simsimd = ">=6.2.1,<7.0.0"
+[dependency-groups]
+test = [
+    "pytest<9.0,>=7.3",
+    "freezegun<2.0.0,>=1.2.2",
+    "pytest-mock<4.0.0,>=3.10.0",
+    "syrupy<5.0.0,>=4.0.2",
+    "pytest-watcher<0.5.0,>=0.3.4",
+    "pytest-asyncio<0.24.0,>=0.21.1",
+    "pytest-docker<4.0.0,>=2.0.1",
+    "pytest-xdist<4.0.0,>=3.5.0",
+    "openai<2.0.0,>=1.6.0",
+    "tiktoken<1,>=0.7",
+    "pytest-cov<6.0,>=4.1",
+    "langchain",
+    "langchain-text-splitters",
+    "langchain-core",
+]
+codespell = [
+    "codespell<3.0.0,>=2.2.0",
+]
+lint = [
+    "ruff<0.4.0,>=0.1.5",
+]
+typing = [
+    "mypy<1.10,>=0.991",
+    "types-requests<3.0.0.0,>=2.31.0.20240403",
+]
+dev = [
+    "ipykernel<7.0.0,>=6.27.1",
+]
+test_integration = [
+    "langchain-openai",
+]
 
-[tool.poetry.group.test]
-optional = true
-
-[tool.poetry.group.test.dependencies]
-pytest = ">=7.3,<9.0"
-freezegun = "^1.2.2"
-pytest-mock = "^3.10.0"
-syrupy = "^4.0.2"
-pytest-watcher = ">=0.3.4,<0.5.0"
-pytest-asyncio = ">=0.21.1,<0.24.0"
+[tool.uv.sources]
 langchain = {git = "https://github.com/langchain-ai/langchain.git", subdirectory = "libs/langchain"}
+langchain-core = {git = "https://github.com/langchain-ai/langchain.git", subdirectory = "libs/core"}
 langchain-text-splitters = {git = "https://github.com/langchain-ai/langchain.git", subdirectory = "libs/text-splitters"}
-pytest-docker = ">=2.0.1,<4.0.0"
-pytest-xdist = "^3.5.0"
-openai = "^1.6.0"
-tiktoken = ">=0.7,<1"
-pytest-cov = ">=4.1,<6.0"
-langchain-core = {git = "https://github.com/langchain-ai/langchain.git", subdirectory = "libs/core"}
-
-[tool.poetry.group.codespell]
-optional = true
-
-[tool.poetry.group.codespell.dependencies]
-codespell = "^2.2.0"
-
-[tool.poetry.group.lint]
-optional = true
-
-[tool.poetry.group.lint.dependencies]
-ruff = ">=0.1.5,<0.4.0"
-
-[tool.poetry.group.typing.dependencies]
-mypy = ">=0.991,<1.10"
-types-requests = "^2.31.0.20240403"
-langchain-core = {git = "https://github.com/langchain-ai/langchain.git", subdirectory = "libs/core"}
-
-[tool.poetry.group.dev]
-optional = true
-
-[tool.poetry.group.dev.dependencies]
-ipykernel = "^6.27.1"
-langchain-core = {git = "https://github.com/langchain-ai/langchain.git", subdirectory = "libs/core"}
-
-[tool.poetry.group.test_integration]
-optional = true
-
-[tool.poetry.group.test_integration.dependencies]
 langchain-openai = {git = "https://github.com/langchain-ai/langchain.git", subdirectory = "libs/partners/openai"}
 
 [tool.ruff]
@@ -74,14 +69,10 @@ lint.select = [
 ]
 
 [tool.mypy]
-disallow_untyped_defs = "True"
+disallow_untyped_defs = true
 
 [tool.coverage.run]
 omit = ["tests/*"]
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 # --strict-markers will raise errors on unknown marks.
